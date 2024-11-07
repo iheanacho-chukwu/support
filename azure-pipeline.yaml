@@ -1,38 +1,14 @@
-# trigger:
-#   branches:
-#     include:
-#       - '*'
-
-pool:
-  name: linux-agent-pool
-
-# stages:
-#   - stage: Build
-#     jobs:
-#       - job: BuildJob
-#         steps:
-#           # Using an if-else template expression to execute different steps
-#           - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-#               - script: echo "This is the main branch."
-#           - ${{ else }}:
-#               - script: echo "This is not the main branch."
-
-
 trigger:
   branches:
     include:
       - '*'
 
-# parameters:
-#   - name: targetBranch
-#     type: string
-#     default: $[ variables['Build.SourceBranchName'] ]
 
 variables:
   # Define the branchName variable conditionally
   - ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')) }}:
       - name: branchEnv
-        value: 'Deploying to Production'
+        value: 'Production'
   - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))) }}:
       - name: branchEnv
         value: 'Deploying to Non-Production'
@@ -42,8 +18,7 @@ stages:
     jobs:
       - job: BuildJob
         steps:
-          - script: echo "Branch is $(Build.SourceBranchName)"
-          - script: echo "$(branchEnv)"
+          - script: echo "Target Environment is $(branchEnv) and deploying from $(Build.SourceBranchName)"
 
 
 
