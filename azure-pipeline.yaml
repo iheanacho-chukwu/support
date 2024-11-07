@@ -2,7 +2,8 @@ trigger:
   branches:
     include:
       - '*'
-
+pool:
+  name: linux-agent-pool
 
 # variables:
 #   # Define the branchName variable conditionally
