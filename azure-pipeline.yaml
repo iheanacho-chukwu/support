@@ -7,18 +7,18 @@ trigger:
 variables:
   # Define the branchName variable conditionally
   - ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')) }}:
-      - name: branchEnv
+      - name: branchName
         value: 'Production'
   - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))) }}:
-      - name: branchEnv
-        value: 'Deploying to Non-Production'
+      - name: branchName
+        value: 'Non-Production'
 
 stages:
   - stage: Build
     jobs:
       - job: BuildJob
         steps:
-          - script: echo "Target Environment is $(branchEnv) and deploying from $(Build.SourceBranchName)"
+          - script: echo "Target Environment is $(branchName)"
 
 
 
