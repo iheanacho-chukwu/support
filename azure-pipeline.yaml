@@ -3,6 +3,9 @@ trigger:
     include:
       - '*'
 
+pool:
+  name: linux-agent-pool
+
 stages:
   - stage: Build
     jobs:
