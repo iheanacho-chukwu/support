@@ -3,16 +3,27 @@ trigger:
     include:
       - '*'
 
+parameters:
+  - name: os
+    type: string
+    default: 'linux'
+    values:
+      - win
+      - linux
+      - mac
+
 variables:
-  ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-    myVar: 'This is the main branch'
-  ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
-    myVar: 'This is not the main branch'
+  ${{ if eq(parameters.os, 'win') }}:
+    testsFolder: 'windows'
+  ${{ elseif eq(parameters.os, 'linux') }}:
+    testsFolder: 'linux'
+  ${{ else }}:
+    testsFolder: 'mac'
 
 stages:
 - stage: Test
   jobs:
   - job: EchoVariable
     steps:
-    - script: echo "Value of myVar: $(myVar)"
-      displayName: "Display Conditional Variable"
+      - script: echo "Value of testsFolder: $(testsFolder)"
+        displayName: "Display Conditional Variable"
