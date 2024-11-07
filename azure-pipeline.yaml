@@ -4,14 +4,20 @@ trigger:
       - '*'
 
 
+# variables:
+#   # Define the branchName variable conditionally
+#   - ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')) }}:
+#       - name: branchName
+#         value: 'master'
+#   - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))) }}:
+#       - name: branchName
+#         value: 'develop'
+
 variables:
-  # Define the branchName variable conditionally
-  - ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')) }}:
-      - name: branchName
-        value: 'Production'
-  - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))) }}:
-      - name: branchName
-        value: 'Non-Production'
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')) }}:
+    branchName: 'master'
+  ${{ else }}:
+    branchName: 'develop'
 
 stages:
   - stage: Build
