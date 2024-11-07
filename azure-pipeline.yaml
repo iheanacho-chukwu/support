@@ -1,7 +1,7 @@
-trigger:
-  branches:
-    include:
-      - '*'
+# trigger:
+#   branches:
+#     include:
+#       - '*'
 
 pool:
   name: linux-agent-pool
@@ -18,15 +18,32 @@ pool:
 #               - script: echo "This is not the main branch."
 
 
+trigger:
+  branches:
+    include:
+      - '*'
+
+parameters:
+  - name: targetBranch
+    type: string
+    default: $[ variables['Build.SourceBranchName'] ]
+
+variables:
+  # Define the message variable conditionally
+  - ${{ if eq(parameters.targetBranch, 'main') }}:
+      - name: message
+        value: 'Deploying to Production'
+  - ${{ if ne(parameters.targetBranch, 'main') }}:
+      - name: message
+        value: 'Deploying to Non-Production'
+
 stages:
   - stage: Build
     jobs:
       - job: BuildJob
-        variables:
-          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}: 
-            myvar1: 'production'
-          ${{ else }}:
-            myvar2: 'development'
         steps:
-          - script: echo "Deploying to $(myvar1)"
+          - script: echo "Branch is $(Build.SourceBranchName)"
+          - script: echo "Message $(message)"
+
+
 
