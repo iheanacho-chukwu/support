@@ -16,7 +16,7 @@ stages:
     jobs:
       - job: BuildJob
         steps:
-          - script: echo "Target Environment is $(branchName)"
+          - script: echo "branchName is $(branchName)"
 
 
 
