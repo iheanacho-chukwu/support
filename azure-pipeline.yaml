@@ -1,0 +1,18 @@
+trigger:
+  branches:
+    include:
+      - '*'
+
+variables:
+  ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+    myVar: 'This is the main branch'
+  ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+    myVar: 'This is not the main branch'
+
+stages:
+- stage: Test
+  jobs:
+  - job: EchoVariable
+    steps:
+    - script: echo "Value of myVar: $(myVar)"
+      displayName: "Display Conditional Variable"
