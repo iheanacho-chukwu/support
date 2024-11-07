@@ -23,10 +23,10 @@ trigger:
     include:
       - '*'
 
-parameters:
-  - name: targetBranch
-    type: string
-    default: $[ variables['Build.SourceBranchName'] ]
+# parameters:
+#   - name: targetBranch
+#     type: string
+#     default: $[ variables['Build.SourceBranchName'] ]
 
 variables:
   # Define the branchName variable conditionally
