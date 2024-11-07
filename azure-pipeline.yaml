@@ -6,13 +6,27 @@ trigger:
 pool:
   name: linux-agent-pool
 
+# stages:
+#   - stage: Build
+#     jobs:
+#       - job: BuildJob
+#         steps:
+#           # Using an if-else template expression to execute different steps
+#           - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+#               - script: echo "This is the main branch."
+#           - ${{ else }}:
+#               - script: echo "This is not the main branch."
+
+
 stages:
   - stage: Build
     jobs:
       - job: BuildJob
+        variables:
+          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}: 
+            myvar1: 'production'
+          ${{ else }}:
+            myvar2: 'development'
         steps:
-          # Using an if-else template expression to execute different steps
-          - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-              - script: echo "This is the main branch."
-          - ${{ else }}:
-              - script: echo "This is not the main branch."
+          - script: echo "Deploying to $(myvar1)"
+
