@@ -31,10 +31,10 @@ parameters:
 variables:
   # Define the message variable conditionally
   - ${{ if eq(parameters.targetBranch, 'main') }}:
-      - name: message
+      - name: branchName
         value: 'Deploying to Production'
   - ${{ if ne(parameters.targetBranch, 'main') }}:
-      - name: message
+      - name: branchName
         value: 'Deploying to Non-Production'
 
 stages:
@@ -42,8 +42,7 @@ stages:
     jobs:
       - job: BuildJob
         steps:
-          - script: echo "Branch is $(Build.SourceBranchName)"
-          - script: echo "Message $(message)"
+          - script: echo "branchName $(branchName)"
 
 
 
