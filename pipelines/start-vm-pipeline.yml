@@ -1,7 +1,7 @@
 trigger: none
 
 variables:
-  serviceConnectionName: "eng-engineering"
+  serviceConnectionName: "onboarding_sc"
   resourceGroupName: "nature-01"
   vmName: "remote-workstation"
 
