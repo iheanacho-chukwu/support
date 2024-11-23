@@ -6,7 +6,7 @@ variables:
   vmName: remote-workstation
 
 schedules:
-  - cron: "0 6 * * 1" # 6 AM  CST Mondays UTC
+  - cron: "0 6 * * 1" # 6 AM  local time Mondays
     displayName: "Start VM Schedule"
     branches:
       include:
