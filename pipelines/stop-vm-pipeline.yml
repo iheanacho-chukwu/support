@@ -20,7 +20,7 @@ steps:
   - task: AzureCLI@2
     displayName: "Stop Azure Virtual Machine"
     inputs:
-      azureSubscription: SERVICE_CONNECTION_NAME
+      azureSubscription: $serviceConnectionName
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
