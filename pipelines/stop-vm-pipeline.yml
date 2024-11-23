@@ -1,0 +1,27 @@
+trigger: none
+
+variables:
+  serviceConnectionName: eng-engineering
+  resourceGroupName: nature-01
+  vmName: remote-workstation
+
+schedules:
+  - cron: "0 18 * * 5" # 6 PM CST Fridays
+    displayName: "Stop VM Schedule"
+    branches:
+      include:
+        - start-stop-vm   # choose the branch its tired to
+    always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Stop Azure Virtual Machine"
+    inputs:
+      azureSubscription: SERVICE_CONNECTION_NAME
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az vm stop --resource-group $resourceGroupName --name $vmName

@@ -1,0 +1,27 @@
+trigger: none
+
+variables:
+  serviceConnectionName: eng-engineering
+  resourceGroupName: nature-01
+  vmName: remote-workstation
+
+schedules:
+  - cron: "0 6 * * 1" # 6 AM  CST Mondays UTC
+    displayName: "Start VM Schedule"
+    branches:
+      include:
+        - start-stop-vm   # choose the branch its tired to
+    always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Start Azure Virtual Machine"
+    inputs:
+      azureSubscription: $serviceConnectionName
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az vm start --resource-group $resourceGroupName --name $vmName
