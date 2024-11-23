@@ -1,9 +1,9 @@
 trigger: none
 
 variables:
-  serviceConnectionName: eng-engineering
-  resourceGroupName: nature-01
-  vmName: remote-workstation
+  serviceConnectionName: "eng-engineering"
+  resourceGroupName: "nature-01"
+  vmName: "remote-workstation"
 
 schedules:
   - cron: "0 6 * * 1" # 6 AM  local time Mondays
@@ -20,8 +20,8 @@ steps:
   - task: AzureCLI@2
     displayName: "Start Azure Virtual Machine"
     inputs:
-      azureSubscription: $serviceConnectionName
+      azureSubscription: $(serviceConnectionName)
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        az vm start --resource-group $resourceGroupName --name $vmName
+        az vm start --resource-group $(resourceGroupName) --name $(vmName)
