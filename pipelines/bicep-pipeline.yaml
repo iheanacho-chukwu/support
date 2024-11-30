@@ -8,6 +8,7 @@ variables:
   location: 'uksouth'
   templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
   parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
+  DeploymentName: main
 
 stages:  
   - stage: Lint
