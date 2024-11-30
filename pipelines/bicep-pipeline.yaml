@@ -24,15 +24,6 @@ stages:
             inputs:
               script: az bicep build-params --file $(parameterFile) --stdout
 
-          # Validate Bicep file 
-          - task: CmdLine@2
-            name: Validate_Bicep
-            displayName: Validate Bicep
-            inputs:
-              script: |
-                az bicep build --file $(templateFile) --stdout
-              failOnStderr: true 
-
           # Lint Bicep Template
           - task: Bash@3
             name: Lint_Bicep_Template
@@ -41,6 +32,14 @@ stages:
               targetType: 'inline'
               script: |
                 bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
+                
+          # Publish Test
+          - task: PublishBuildArtifacts@1
+            condition: always()
+            displayName: Publish Linting Results
+            inputs:
+              pathToPublish: $(System.DefaultWorkingDirectory)/bicep.sarif
+              artifactName: CodeAnalysisLogs # required to show up in the scans tab
 
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
