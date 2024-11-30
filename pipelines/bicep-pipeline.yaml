@@ -4,7 +4,7 @@ pool:
 name: Deploy Bicep files
 
 variables:
-  serviceConnectionName: 'onboarding_sc'
+  serviceConnectionName: 'eng-lab-automation'
   location: 'uksouth'
   templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
   parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
