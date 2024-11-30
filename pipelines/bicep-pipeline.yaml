@@ -22,15 +22,6 @@ stages:
             inputs:
               script: az bicep build-params --file ${{ variables.parameterFile }} --stdout
 
-          # Format Bicep file 
-          - task: CmdLine@2
-            name: Format_Bicep
-            displayName: Format Bicep
-            inputs:
-              script: |
-                az bicep format --file ${{ variables.templateFile }}
-              failOnStderr: true  
-
           # Validate Bicep file 
           - task: CmdLine@2
             name: Validate_Bicep
