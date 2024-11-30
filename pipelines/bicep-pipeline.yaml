@@ -22,7 +22,7 @@ stages:
             name: Validate_Bicep_Parameters_File
             displayName: Validate Bicep Parameters File
             inputs:
-              script: az bicep build-params --file ${{ variables.parameterFile }} --stdout
+              script: az bicep build-params --file $(parameterFile) --stdout
 
           # Validate Bicep file 
           - task: CmdLine@2
@@ -30,8 +30,17 @@ stages:
             displayName: Validate Bicep
             inputs:
               script: |
-                az bicep build --file ${{ variables.templateFile }} --stdout
+                az bicep build --file $(templateFile) --stdout
               failOnStderr: true 
+
+          # Lint Bicep Template
+          - task: Bash@3
+            name: Lint_Bicep_Template
+            displayName: Lint Bicep Template
+            inputs:
+              targetType: 'inline'
+              script: |
+                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
 
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
@@ -44,13 +53,13 @@ stages:
             name: Bicep_Deployment_Validation
             displayName: Bicep Deployment Validation
             inputs:
-              azureSubscription: ${{ variables.serviceConnectionName }}
+              azureSubscription: $(serviceConnectionName)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 az deployment sub validate --location uksouth \
-                --template-file ${{ variables.templateFile }} \
-                --parameters ${{ variables.parameterFile }}
+                --template-file $(templateFile) \
+                --parameters $(parameterFile)
               workingDirectory: $(Pipeline.Workspace)
 
           # Preview Bicep Deployment
@@ -58,14 +67,14 @@ stages:
             name: Preview_Bicep_Template
             displayName: Preview Bicep Deployment
             inputs:
-              deploymentName: ${{ variables.DeploymentName }}
+              deploymentName: $(DeploymentName)
               deploymentScope: 'Subscription'
-              armServiceConnection: ${{ variables.serviceConnectionName }}
-              subscriptionId: ${{ variables.subscriptionId }}
+              armServiceConnection: $(serviceConnectionName)
+              subscriptionId: $(subscriptionId)
               location: 'UK South'
               templateLocation: 'File'
-              templateFile: '${{ variables.templateFile }}'
-              templateParametersFile: '${{ variables.parameterFile }}'
+              templateFile: '$(templateFile)'
+              templateParametersFile: '$(parameterFile)'
 
   - stage: Deploy
     dependsOn: ValidatePreviewDeployment
@@ -82,11 +91,11 @@ stages:
                   name: Infrastructure_Deployment
                   displayName: Infrastructure Deployment
                   inputs:
-                    azureSubscription: ${{ variables.serviceConnectionName }}
+                    azureSubscription: $(serviceConnectionName)
                     scriptType: bash
                     scriptLocation: inlineScript
                     inlineScript: |
                       az deployment sub create --location uksouth \
-                      --template-file ${{ variables.templateFile }} \
-                      --parameters ${{ variables.parameterFile }}
+                      --template-file $(templateFile) \
+                      --parameters $(parameterFile)
                     workingDirectory: $(Pipeline.Workspace)
