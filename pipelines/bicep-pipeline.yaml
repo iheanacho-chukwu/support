@@ -9,6 +9,7 @@ variables:
   templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
   parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
   DeploymentName: main
+  subscriptionId: 800eeb5c-ab87-468f-800b-d9ca632b4f73
 
 stages:  
   - stage: Lint
