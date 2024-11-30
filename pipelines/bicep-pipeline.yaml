@@ -41,6 +41,17 @@ stages:
               pathToPublish: $(System.DefaultWorkingDirectory)/bicep.sarif
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
 
+
+          - task: MicrosoftSecurityDevOps@1
+            displayName: 'Microsoft Security DevOps'
+            inputs:
+              tools: 'checkov' # Specify Checkov as the tool
+              categories: 'IaC' # Specify Infrastructure-as-Code category to include Bicep
+              break: true # Optionally fail the build on high severity issues
+              publish: true # Publish SARIF results for pipeline artifact
+              artifactName: 'BicepCodeAnalysisLogs' # Customize the artifact name
+
+
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
     jobs:
