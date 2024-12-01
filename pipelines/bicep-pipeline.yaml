@@ -1,7 +1,7 @@
 pool:
   name: linux-agent-pool
 
-name: Deploy Bicep files
+name: Azure Bicep IaC Compliance
 
 variables:
   serviceConnectionName: 'eng-lab-automation'
@@ -31,16 +31,17 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
+                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep-linter-report.sarif
 
-          # Run Checkov Scan
+          # Run Static Analysis Scan Using Checkov
           - task: Bash@3
-            name: Run_Checkov_Scan
+            name:  Static_Analysis_Using_Checkov
             inputs:
               targetType: 'inline'
               script: |
-                checkov --file $(templateFile) --framework bicep --soft-fail --quiet --compact --output sarif \
-                --output-file-path $(System.DefaultWorkingDirectory)/ > results_checkov.sarif
+                checkov --file $(templateFile) --framework bicep \
+                --soft-fail --quiet --compact --output sarif \
+                --output-file-path $(System.DefaultWorkingDirectory) > bicep-checkov-report.sarif
             displayName: "Run Checkov for Compliance check"
 
           # Publish Test
@@ -50,30 +51,6 @@ stages:
             inputs:
               pathToPublish: $(System.DefaultWorkingDirectory)
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
-
-          - task: replacetokens@5
-            name: Update_File
-            displayName: Update File
-            inputs:
-              targetFiles: $(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
-              encoding: auto
-              tokenPattern: default
-              writeBOM: true
-              escapeType: none
-              verbosity: detailed
-              actionOnMissing: warn
-              keepToken: false
-              actionOnNoFiles: warn
-              enableTransforms: false
-              enableRecursion: false
-              useLegacyPattern: false
-              enableTelemetry: false
-
-          - task: MicrosoftSecurityDevOps@1
-            displayName: 'Microsoft Security DevOps'
-            inputs:
-              categories: 'IaC'
-              tools: 'checkov'
 
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
