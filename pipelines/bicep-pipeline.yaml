@@ -51,6 +51,24 @@ stages:
               pathToPublish: $(System.DefaultWorkingDirectory)
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
 
+          - task: replacetokens@5
+            name: Update_File
+            displayName: Update File
+            inputs:
+              targetFiles: $(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
+              encoding: auto
+              tokenPattern: default
+              writeBOM: true
+              escapeType: none
+              verbosity: detailed
+              actionOnMissing: warn
+              keepToken: false
+              actionOnNoFiles: warn
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: false
+
           - task: MicrosoftSecurityDevOps@1
             displayName: 'Microsoft Security DevOps'
             inputs:
