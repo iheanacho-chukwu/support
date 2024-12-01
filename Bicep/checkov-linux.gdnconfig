@@ -6,7 +6,6 @@
         "version": "Latest"
       },
       "arguments": {
-        "File": "/home/vsts/work/1/s/Bicep/main.bicep",
         "Directory": "/home/vsts/work/1/s/Bicep",
         "Framework": "Bicep",
         "ShowConfig": "true",
