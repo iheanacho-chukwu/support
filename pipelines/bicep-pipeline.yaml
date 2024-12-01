@@ -32,24 +32,24 @@ stages:
               targetType: 'inline'
               script: |
                 bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
-                
+
+          # Run Checkov Scan
+          - task: Bash@3
+            name: Run_Checkov_Scan
+            inputs:
+              targetType: 'inline'
+              script: |
+                checkov --file $(templateFile) --framework bicep --soft-fail --quiet --compact --output sarif \
+                --output-file-path $(System.DefaultWorkingDirectory)/ > results_checkov.sarif
+            displayName: "Run Checkov for Compliance check"
+
           # Publish Test
           - task: PublishBuildArtifacts@1
             condition: always()
             displayName: Publish Linting Results
             inputs:
-              pathToPublish: $(System.DefaultWorkingDirectory)/bicep.sarif
+              pathToPublish: $(System.DefaultWorkingDirectory)
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
-
-          - task: MicrosoftSecurityDevOps@1
-            inputs:
-              command: 'run'
-              categories: 'IaC'
-              break: false
-              languages: 'Bicep'
-              tools: 'checkov'
-              publish: true
-              artifactName: 'BicepCodeAnalysisLogs' 
 
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
