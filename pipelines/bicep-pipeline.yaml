@@ -55,7 +55,7 @@ stages:
             name: Update_File
             displayName: Update File
             inputs:
-              targetFiles: $(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
+              targetFiles: '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
               encoding: auto
               tokenPattern: default
               writeBOM: true
@@ -68,6 +68,14 @@ stages:
               enableRecursion: false
               useLegacyPattern: false
               enableTelemetry: false
+
+          - task: Bash@3
+            name: check_config_file
+            displayName: check_config_file
+            inputs:
+              targetType: 'inline'
+              script: |
+                cat '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'   
 
           - task: MicrosoftSecurityDevOps@1
             displayName: 'Microsoft Security DevOps'
