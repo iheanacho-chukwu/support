@@ -92,14 +92,14 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                cat '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'   
+                cat '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'   
 
           - task: MicrosoftSecurityDevOps@1
             displayName: 'Microsoft Security DevOps'
             inputs:
               categories: 'IaC'
               tools: 'checkov'
-              config: '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
+              config: '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'
               publish: true
               artifactName: 'CodeAnalysisLogs'
 
