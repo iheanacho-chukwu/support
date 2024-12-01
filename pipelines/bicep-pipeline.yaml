@@ -1,111 +1,43 @@
-pool:
-  name: linux-agent-pool
-
-name: Azure Bicep IaC Compliance
-
-variables:
-  serviceConnectionName: 'eng-lab-automation'
-  location: 'uksouth'
-  templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
-  parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
-  DeploymentName: main
-  subscriptionId: 800eeb5c-ab87-468f-800b-d9ca632b4f73
-
-stages:  
-  - stage: Lint
+  - stage: CodeComplianceCheck
     jobs:
-      - job: LintCode
-        displayName: Lint code
+      - job: RunComplianceChecks
+        displayName: Run Code Compliance Checks
         steps:
-          # Validate Bicep parameter file is valid bicepparam
           - task: CmdLine@2
-            name: Validate_Bicep_Parameters_File
-            displayName: Validate Bicep Parameters File
+            name: ValidateParametersFile
+            displayName: Validate Parameters File
             inputs:
-              script: az bicep build-params --file $(parameterFile) --stdout
+              script: bicep build-params --file $(parameterFile) --stdout
 
-          # Lint Bicep Template
           - task: Bash@3
-            name: Lint_Bicep_Template
-            displayName: Lint Bicep Template
+            name: CheckBicepFormat
+            displayName: "Check Bicep Template Format"
+            inputs:
+              targetType: 'inline'
+              script: |
+                bicep format $(templateFile) --check
+
+          - task: Bash@3
+            name: RunBicepLint
+            displayName: Run Bicep Linter
             inputs:
               targetType: 'inline'
               script: |
                 bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep-linter-report.sarif
 
-          # Run Static Analysis Scan Using Checkov
           - task: Bash@3
-            name:  Static_Analysis_Using_Checkov
+            name: RunCheckovComplianceScan
+            displayName: Run Checkov Compliance Scan
             inputs:
               targetType: 'inline'
               script: |
                 checkov --file $(templateFile) --framework bicep \
                 --soft-fail --quiet --compact --output sarif \
-                --output-file-path $(System.DefaultWorkingDirectory) > bicep-checkov-report.sarif
-            displayName: "Run Checkov for Compliance check"
+                --output-file-path $(System.DefaultWorkingDirectory)/bicep-checkov-report.sarif
 
-          # Publish Test
           - task: PublishBuildArtifacts@1
-            condition: always()
-            displayName: Publish Linting Results
+            name: PublishCodeAnalysisReports
+            displayName: Publish Code Analysis Reports
             inputs:
               pathToPublish: $(System.DefaultWorkingDirectory)
-              artifactName: CodeAnalysisLogs # required to show up in the scans tab
-
-  - stage: ValidatePreviewDeployment
-    dependsOn: Lint
-    jobs:
-      - job: ValidatePreviewDeployment
-        displayName: Validate & Preview Deployment
-        steps:
-          # Validate Bicep Deployment
-          - task: AzureCLI@2
-            name: Bicep_Deployment_Validation
-            displayName: Bicep Deployment Validation
-            inputs:
-              azureSubscription: $(serviceConnectionName)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                az deployment sub validate --location uksouth \
-                --template-file $(templateFile) \
-                --parameters $(parameterFile)
-              workingDirectory: $(Pipeline.Workspace)
-
-          # Preview Bicep Deployment
-          - task: ARMDeploymentInsights@2
-            name: Preview_Bicep_Template
-            displayName: Preview Bicep Deployment
-            inputs:
-              deploymentName: $(DeploymentName)
-              deploymentScope: 'Subscription'
-              armServiceConnection: $(serviceConnectionName)
-              subscriptionId: $(subscriptionId)
-              location: 'UK South'
-              templateLocation: 'File'
-              templateFile: '$(templateFile)'
-              templateParametersFile: '$(parameterFile)'
-
-  - stage: Deploy
-    dependsOn: ValidatePreviewDeployment
-    jobs:
-      - deployment: Deploy
-        environment: DEV
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                # Deploy Bicep Deployment
-                - task: AzureCLI@2
-                  name: Infrastructure_Deployment
-                  displayName: Infrastructure Deployment
-                  inputs:
-                    azureSubscription: $(serviceConnectionName)
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az deployment sub create --location uksouth \
-                      --template-file $(templateFile) \
-                      --parameters $(parameterFile)
-                    workingDirectory: $(Pipeline.Workspace)
+              artifactName: CodeAnalysisLogs
