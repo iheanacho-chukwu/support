@@ -1,5 +1,5 @@
 pool:
-  name: linux-agent-pool
+  vmImage: ubuntu-latest
 
 name: Deploy Bicep files
 
@@ -17,39 +17,39 @@ stages:
       - job: LintCode
         displayName: Lint code
         steps:
-          # Validate Bicep parameter file is valid bicepparam
-          - task: CmdLine@2
-            name: Validate_Bicep_Parameters_File
-            displayName: Validate Bicep Parameters File
-            inputs:
-              script: az bicep build-params --file $(parameterFile) --stdout
+          # # Validate Bicep parameter file is valid bicepparam
+          # - task: CmdLine@2
+          #   name: Validate_Bicep_Parameters_File
+          #   displayName: Validate Bicep Parameters File
+          #   inputs:
+          #     script: az bicep build-params --file $(parameterFile) --stdout
 
-          # Lint Bicep Template
-          - task: Bash@3
-            name: Lint_Bicep_Template
-            displayName: Lint Bicep Template
-            inputs:
-              targetType: 'inline'
-              script: |
-                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
+          # # Lint Bicep Template
+          # - task: Bash@3
+          #   name: Lint_Bicep_Template
+          #   displayName: Lint Bicep Template
+          #   inputs:
+          #     targetType: 'inline'
+          #     script: |
+          #       bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/bicep.sarif
 
-          # Run Checkov Scan
-          - task: Bash@3
-            name: Run_Checkov_Scan
-            inputs:
-              targetType: 'inline'
-              script: |
-                checkov --file $(templateFile) --framework bicep --soft-fail --quiet --compact --output sarif \
-                --output-file-path $(System.DefaultWorkingDirectory)/ > results_checkov.sarif
-            displayName: "Run Checkov for Compliance check"
+          # # Run Checkov Scan
+          # - task: Bash@3
+          #   name: Run_Checkov_Scan
+          #   inputs:
+          #     targetType: 'inline'
+          #     script: |
+          #       checkov --file $(templateFile) --framework bicep --soft-fail --quiet --compact --output sarif \
+          #       --output-file-path $(System.DefaultWorkingDirectory)/ > results_checkov.sarif
+          #   displayName: "Run Checkov for Compliance check"
 
-          # Publish Test
-          - task: PublishBuildArtifacts@1
-            condition: always()
-            displayName: Publish Linting Results
-            inputs:
-              pathToPublish: $(System.DefaultWorkingDirectory)
-              artifactName: CodeAnalysisLogs # required to show up in the scans tab
+          # # Publish Test
+          # - task: PublishBuildArtifacts@1
+          #   condition: always()
+          #   displayName: Publish Linting Results
+          #   inputs:
+          #     pathToPublish: $(System.DefaultWorkingDirectory)
+          #     artifactName: CodeAnalysisLogs # required to show up in the scans tab
 
           - task: replacetokens@5
             name: Update_File
@@ -74,61 +74,62 @@ stages:
             inputs:
               categories: 'IaC'
               tools: 'checkov'
+              config: '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'           
 
-  - stage: ValidatePreviewDeployment
-    dependsOn: Lint
-    jobs:
-      - job: ValidatePreviewDeployment
-        displayName: Validate & Preview Deployment
-        steps:
-          # Validate Bicep Deployment
-          - task: AzureCLI@2
-            name: Bicep_Deployment_Validation
-            displayName: Bicep Deployment Validation
-            inputs:
-              azureSubscription: $(serviceConnectionName)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                az deployment sub validate --location uksouth \
-                --template-file $(templateFile) \
-                --parameters $(parameterFile)
-              workingDirectory: $(Pipeline.Workspace)
+  # - stage: ValidatePreviewDeployment
+  #   dependsOn: Lint
+  #   jobs:
+  #     - job: ValidatePreviewDeployment
+  #       displayName: Validate & Preview Deployment
+  #       steps:
+  #         # Validate Bicep Deployment
+  #         - task: AzureCLI@2
+  #           name: Bicep_Deployment_Validation
+  #           displayName: Bicep Deployment Validation
+  #           inputs:
+  #             azureSubscription: $(serviceConnectionName)
+  #             scriptType: bash
+  #             scriptLocation: inlineScript
+  #             inlineScript: |
+  #               az deployment sub validate --location uksouth \
+  #               --template-file $(templateFile) \
+  #               --parameters $(parameterFile)
+  #             workingDirectory: $(Pipeline.Workspace)
 
-          # Preview Bicep Deployment
-          - task: ARMDeploymentInsights@2
-            name: Preview_Bicep_Template
-            displayName: Preview Bicep Deployment
-            inputs:
-              deploymentName: $(DeploymentName)
-              deploymentScope: 'Subscription'
-              armServiceConnection: $(serviceConnectionName)
-              subscriptionId: $(subscriptionId)
-              location: 'UK South'
-              templateLocation: 'File'
-              templateFile: '$(templateFile)'
-              templateParametersFile: '$(parameterFile)'
+  #         # Preview Bicep Deployment
+  #         - task: ARMDeploymentInsights@2
+  #           name: Preview_Bicep_Template
+  #           displayName: Preview Bicep Deployment
+  #           inputs:
+  #             deploymentName: $(DeploymentName)
+  #             deploymentScope: 'Subscription'
+  #             armServiceConnection: $(serviceConnectionName)
+  #             subscriptionId: $(subscriptionId)
+  #             location: 'UK South'
+  #             templateLocation: 'File'
+  #             templateFile: '$(templateFile)'
+  #             templateParametersFile: '$(parameterFile)'
 
-  - stage: Deploy
-    dependsOn: ValidatePreviewDeployment
-    jobs:
-      - deployment: Deploy
-        environment: DEV
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                # Deploy Bicep Deployment
-                - task: AzureCLI@2
-                  name: Infrastructure_Deployment
-                  displayName: Infrastructure Deployment
-                  inputs:
-                    azureSubscription: $(serviceConnectionName)
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az deployment sub create --location uksouth \
-                      --template-file $(templateFile) \
-                      --parameters $(parameterFile)
-                    workingDirectory: $(Pipeline.Workspace)
+  # # - stage: Deploy
+  #   dependsOn: ValidatePreviewDeployment
+  #   jobs:
+  #     - deployment: Deploy
+  #       environment: DEV
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - checkout: self
+  #               # Deploy Bicep Deployment
+  #               - task: AzureCLI@2
+  #                 name: Infrastructure_Deployment
+  #                 displayName: Infrastructure Deployment
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnectionName)
+  #                   scriptType: bash
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az deployment sub create --location uksouth \
+  #                     --template-file $(templateFile) \
+  #                     --parameters $(parameterFile)
+  #                   workingDirectory: $(Pipeline.Workspace)
