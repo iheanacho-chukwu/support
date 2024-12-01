@@ -2,7 +2,7 @@
   "tools": [
     {
       "tool": {
-        "name": "checkov",
+        "name": "Checkov",
         "version": "Latest"
       },
       "arguments": {
