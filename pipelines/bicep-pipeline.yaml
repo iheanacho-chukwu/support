@@ -61,9 +61,10 @@ stages:
           - task: PublishBuildArtifacts@1
             name: PublishCodeAnalysisReports
             displayName: Publish Code Analysis Reports
+            condition: always()
             inputs:
               pathToPublish: $(System.DefaultWorkingDirectory)/test/
-              artifactName: CodeAnalysisLogs # required to show up in the scans tab
+              artifactName:  CodeAnalysisLogs # required to show up in the scans tab
               
   - stage: Deploy
     dependsOn: CodeComplianceCheck
