@@ -30,7 +30,14 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                az bicep format --file $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
+                formatted_output=$(mktemp)
+                az bicep format --file $(templateFile) --outfile $formatted_output
+                if ! diff -q $(templateFile) $formatted_output; then
+                  echo "Bicep file format validation failed. Please run 'bicep format' locally to fix."
+                  exit 1
+                else
+                  echo "Bicep file is correctly formatted."
+                fi
 
           - task: Bash@3
             name: RunBicepLint
