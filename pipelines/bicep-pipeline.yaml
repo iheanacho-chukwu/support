@@ -16,33 +16,7 @@ stages:
     jobs:
       - job: LintCode
         displayName: Lint code
-        steps:              
-          - task: replacetokens@5
-            name: Update_File
-            displayName: Update File
-            inputs:
-              targetFiles: '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'
-              encoding: auto
-              tokenPattern: default
-              writeBOM: true
-              escapeType: none
-              verbosity: detailed
-              actionOnMissing: warn
-              keepToken: false
-              actionOnNoFiles: warn
-              enableTransforms: false
-              enableRecursion: false
-              useLegacyPattern: false
-              enableTelemetry: false
-
-          - task: Bash@3
-            name: check_config_file
-            displayName: check_config_file
-            inputs:
-              targetType: 'inline'
-              script: |
-                cat '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'   
-
+        steps:               
           - task: MicrosoftSecurityDevOps@1
             displayName: 'Microsoft Security DevOps'
             inputs:
