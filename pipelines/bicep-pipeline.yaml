@@ -47,7 +47,6 @@ stages:
             displayName: 'Microsoft Security DevOps'
             inputs:
               categories: 'IaC'
-              tools: 'checkov'
               config: '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'
               publish: true
               artifactName: 'CodeAnalysisLogs'
