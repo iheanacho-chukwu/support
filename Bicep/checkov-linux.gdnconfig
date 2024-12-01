@@ -2,12 +2,13 @@
   "tools": [
     {
       "tool": {
-        "name": "Checkov",
+        "name": "checkov",
         "version": "Latest"
       },
       "arguments": {
-        "Framework": "Bicep",
-        "ShowConfig": "true",
+        "Directory": "/home/vsts/work/1/s/Bicep",
+        "File": "/home/vsts/work/1/s/Bicep",
+        "Framework": "bicep",
         "Quiet": "true"
       }
     }
