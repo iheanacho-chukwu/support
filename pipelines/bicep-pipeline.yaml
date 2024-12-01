@@ -56,7 +56,7 @@ stages:
               script: |
                 checkov --file $(templateFile) --framework bicep \
                 --soft-fail --quiet --compact --output sarif \
-                --output-file-path $(System.DefaultWorkingDirectory)/test > results_sarif.sarif
+                --output-file-path $(System.DefaultWorkingDirectory)/test > bicep-checkov.sarif
 
           - task: PublishBuildArtifacts@1
             name: PublishCodeAnalysisReports
