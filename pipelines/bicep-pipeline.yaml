@@ -99,7 +99,9 @@ stages:
             inputs:
               categories: 'IaC'
               tools: 'checkov'
-              config: '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'           
+              config: '$(Build.Repository.LocalPath)/Bicep/checkov.gdnconfig'
+              publish: true
+              artifactName: 'CodeAnalysisLogs'
 
   # - stage: ValidatePreviewDeployment
   #   dependsOn: Lint
