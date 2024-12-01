@@ -7,7 +7,7 @@
       },
       "arguments": {
         "Directory": "/home/vsts/work/1/s/Bicep",
-        "File": "/home/vsts/work/1/s/Bicep",
+        "File": "/home/vsts/work/1/s/Bicep/main.bicep",
         "Framework": "bicep",
         "Quiet": "true"
       }
