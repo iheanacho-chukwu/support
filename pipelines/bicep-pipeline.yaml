@@ -30,7 +30,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                az bicep format $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
+                az bicep format --file $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
 
           - task: Bash@3
             name: RunBicepLint
