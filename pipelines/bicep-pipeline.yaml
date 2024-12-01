@@ -33,7 +33,7 @@ stages:
                 formatted_output=$(mktemp)
                 az bicep format --file $(templateFile) --outfile $formatted_output
                 if ! diff -q $(templateFile) $formatted_output; then
-                  echo "Bicep file format validation failed. Please run 'bicep format' locally to fix."
+                  echo "Bicep file format validation failed. Please run 'az bicep format --file main.bicep' locally to fix."
                   exit 1
                 else
                   echo "Bicep file is correctly formatted."
