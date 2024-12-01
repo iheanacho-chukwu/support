@@ -44,7 +44,6 @@ stages:
           - task: MicrosoftSecurityDevOps@1
             inputs:
               command: 'run'
-              config: '$(templateFile)'
               categories: 'IaC'
               break: false
               languages: 'Bicep'
