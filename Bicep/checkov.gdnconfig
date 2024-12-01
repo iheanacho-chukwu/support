@@ -6,29 +6,11 @@
         "version": "Latest"
       },
       "arguments": {
-        "SkipPath": "",
-        "Directory": "",
         "File": "#{templateFile}#",
-        "ExternalChecksDir": "",
-        "List": "true",
         "Framework": "Bicep",
-        "SkipFramework": "",
-        "Check": "",
-        "SkipCheck": "",
-        "HardFailOn": "",
-        "DownloadExternalModules": "",
-        "ExternalModulesDownloadPath": "",
-        "ConfigFile": "",
-        "CreateConfig": "",
         "ShowConfig": "true",
-        "CreateBaseLine": "",
-        "Baseline": "",
-        "NoFailOnCrash": "",
-        "EnableSecretScanAllFiles": "false",
-        "BlockListSecretScan": "",
-        "Quiet": "false",
-        "Help": "",
-        "Version": ""
+        "SoftFail": "true",
+        "Quiet": "false"
       }
     }
   ]
