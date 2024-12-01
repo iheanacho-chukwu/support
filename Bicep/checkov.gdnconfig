@@ -9,8 +9,7 @@
         "Directory": "/home/vsts/work/1/s/Bicep",
         "Framework": "Bicep",
         "ShowConfig": "true",
-        "SoftFail": "true",
-        "Quiet": "false"
+        "Quiet": "true"
       }
     }
   ]
