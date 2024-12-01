@@ -1,3 +1,17 @@
+pool:
+  name: linux-agent-pool
+
+name: Azure Bicep IaC Compliance
+
+variables:
+  serviceConnectionName: 'eng-lab-automation'
+  location: 'uksouth'
+  templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
+  parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
+  DeploymentName: main
+  subscriptionId: 800eeb5c-ab87-468f-800b-d9ca632b4f73
+
+stages:
   - stage: CodeComplianceCheck
     jobs:
       - job: RunComplianceChecks
@@ -15,7 +29,7 @@
             inputs:
               targetType: 'inline'
               script: |
-                bicep format $(templateFile) --check
+                bicep format $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
 
           - task: Bash@3
             name: RunBicepLint
@@ -40,4 +54,28 @@
             displayName: Publish Code Analysis Reports
             inputs:
               pathToPublish: $(System.DefaultWorkingDirectory)
-              artifactName: CodeAnalysisLogs
+              artifactName: BicepLintAndCheckovReports
+
+  # - stage: Deploy
+  #   dependsOn: CodeComplianceCheck
+  #   condition: succeeded()
+  #   jobs:
+  #     - deployment: Deploy
+  #       environment: DEV
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - checkout: self
+  #               - task: AzureCLI@2
+  #                 name: DeployInfrastructureResources
+  #                 displayName: Deploy Infrastructure Resources
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnectionName)
+  #                   scriptType: bash
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az deployment sub create --location uksouth \
+  #                     --template-file $(templateFile) \
+  #                     --parameters $(parameterFile)
+  #                   workingDirectory: $(Pipeline.Workspace)
