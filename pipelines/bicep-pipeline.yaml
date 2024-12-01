@@ -21,7 +21,8 @@ stages:
             name: ValidateParametersFile
             displayName: Validate Parameters File
             inputs:
-              script: bicep build-params --file $(parameterFile) --stdout
+              script: |
+                az bicep build-params --file $(parameterFile) --stdout
 
           - task: Bash@3
             name: CheckBicepFormat
@@ -29,7 +30,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                bicep format $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
+                az bicep format $(templateFile) --check || (echo "Bicep file format validation failed. Please run 'bicep format' locally to fix." && exit 1)
 
           - task: Bash@3
             name: RunBicepLint
@@ -56,26 +57,26 @@ stages:
               pathToPublish: $(System.DefaultWorkingDirectory)
               artifactName: BicepLintAndCheckovReports
 
-  # - stage: Deploy
-  #   dependsOn: CodeComplianceCheck
-  #   condition: succeeded()
-  #   jobs:
-  #     - deployment: Deploy
-  #       environment: DEV
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #               - task: AzureCLI@2
-  #                 name: DeployInfrastructureResources
-  #                 displayName: Deploy Infrastructure Resources
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnectionName)
-  #                   scriptType: bash
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az deployment sub create --location uksouth \
-  #                     --template-file $(templateFile) \
-  #                     --parameters $(parameterFile)
-  #                   workingDirectory: $(Pipeline.Workspace)
+  - stage: Deploy
+    dependsOn: CodeComplianceCheck
+    condition: succeeded()
+    jobs:
+      - deployment: Deploy
+        environment: DEV
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  name: DeployInfrastructureResources
+                  displayName: Deploy Infrastructure Resources
+                  inputs:
+                    azureSubscription: $(serviceConnectionName)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az deployment sub create --location uksouth \
+                      --template-file $(templateFile) \
+                      --parameters $(parameterFile)
+                    workingDirectory: $(Pipeline.Workspace)
