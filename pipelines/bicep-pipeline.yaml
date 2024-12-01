@@ -46,7 +46,7 @@ stages:
               targetType: 'inline'
               script: |
                 mkdir -p $(System.DefaultWorkingDirectory)/test
-                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/test/bicep-linter-report.sarif
+                bicep lint $(templateFile) --diagnostics-format sarif > $(System.DefaultWorkingDirectory)/test/bicep-linter.sarif
 
           - task: Bash@3
             name: RunCheckovComplianceScan
@@ -56,13 +56,13 @@ stages:
               script: |
                 checkov --file $(templateFile) --framework bicep \
                 --soft-fail --quiet --compact --output sarif \
-                --output-file-path $(System.DefaultWorkingDirectory)/test/bicep-checkov-report.sarif
+                --output-file-path $(System.DefaultWorkingDirectory)/test > results_sarif.sarif
 
           - task: PublishBuildArtifacts@1
             name: PublishCodeAnalysisReports
             displayName: Publish Code Analysis Reports
             inputs:
-              pathToPublish: $(System.DefaultWorkingDirectory)/test
+              pathToPublish: $(System.DefaultWorkingDirectory)/test/
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
               
   - stage: Deploy
