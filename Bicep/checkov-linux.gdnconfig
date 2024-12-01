@@ -1,0 +1,17 @@
+{
+  "tools": [
+    {
+      "tool": {
+        "name": "Checkov",
+        "version": "Latest"
+      },
+      "arguments": {
+        "File": "/home/vsts/work/1/s/Bicep/main.bicep",
+        "Framework": "Bicep",
+        "ShowConfig": "true",
+        "SoftFail": "true",
+        "Quiet": "false"
+      }
+    }
+  ]
+}
