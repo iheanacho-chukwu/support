@@ -8,7 +8,7 @@
       "arguments": {
         "SkipPath": "",
         "Directory": "",
-        "File": ""#{templateFile}#"",
+        "File": "#{templateFile}#",
         "ExternalChecksDir": "",
         "List": "true",
         "Framework": "Bicep",
