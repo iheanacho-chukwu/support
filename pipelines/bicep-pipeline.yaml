@@ -62,8 +62,8 @@ stages:
             displayName: Publish Code Analysis Reports
             inputs:
               pathToPublish: $(System.DefaultWorkingDirectory)
-              artifactName: BicepLintAndCheckovReports
-
+              artifactName: CodeAnalysisLogs # required to show up in the scans tab
+              
   - stage: Deploy
     dependsOn: CodeComplianceCheck
     condition: succeeded()
