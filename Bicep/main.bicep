@@ -1,4 +1,4 @@
-targetScope='subscription'
+targetScope = 'subscription'
 
 param resourceGroupUKSParam object
 param tagsParam object
@@ -6,7 +6,7 @@ param vnetParam object
 param vmParam object
 param deploySSHParam bool = false
 
-param deploymentNameParam string  = 'agentpool'
+param deploymentNameParam string = 'agentpool'
 
 module resourceGroupUKS 'modules/resource-group.bicep' = {
   name: '${deploymentNameParam}-resourceGroup'
@@ -51,7 +51,7 @@ module roleAssignment 'modules/role-assignment.bicep' = {
   params: {
     vmManagedIdentityPrincipalId: virtualMachine.outputs.vmManagedIdentityPrincipalId
   }
-} 
+}
 
 output subnetId string = virtualNetwork.outputs.subnetId
 output networkSecurityGroupId string = virtualNetwork.outputs.networkSecurityGroupId
