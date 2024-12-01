@@ -51,6 +51,12 @@ stages:
               pathToPublish: $(System.DefaultWorkingDirectory)
               artifactName: CodeAnalysisLogs # required to show up in the scans tab
 
+          - task: MicrosoftSecurityDevOps@1
+            displayName: 'Microsoft Security DevOps'
+            inputs:
+              categories: 'IaC'
+              tools: 'checkov'
+
   - stage: ValidatePreviewDeployment
     dependsOn: Lint
     jobs:
