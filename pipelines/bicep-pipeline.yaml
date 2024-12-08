@@ -1,26 +1,20 @@
-pool:
-  vmImage: ubuntu-latest
-
-name: Deploy Bicep files
+trigger:
+- main
 
 variables:
-  serviceConnectionName: 'eng-lab-automation'
-  location: 'uksouth'
-  templateFile: '$(Build.Repository.LocalPath)/Bicep/main.bicep'
-  parameterFile: '$(Build.Repository.LocalPath)/Bicep/env/dev.bicepparam'
-  DeploymentName: main
-  subscriptionId: 800eeb5c-ab87-468f-800b-d9ca632b4f73
+  - group: DEV  # Make sure this variable group exists and contains 'agent_pool' and 'env'
+  - name: environment
+    value: ${{ variables.env }}  # Compile-time evaluation
 
-stages:  
-  - stage: Lint
+stages:
+  - stage: DEV
+    displayName: 'Development Stage'
+    pool:
+      name: ${{ variables.agent_pool }}  # Compile-time pool reference
     jobs:
-      - job: LintCode
-        displayName: Lint code
-        steps:               
-          - task: MicrosoftSecurityDevOps@1
-            displayName: 'Microsoft Security DevOps'
-            inputs:
-              categories: 'IaC'
-              config: '$(Build.Repository.LocalPath)/Bicep/checkov-linux.gdnconfig'
-              publish: true
-              artifactName: 'CodeAnalysisLogs'
+      - job: TestJob
+        steps:
+          - script: |
+              echo "Running on the agent pool: ${{ variables.agent_pool }}"
+              echo "The environment is: ${{ variables.environment }}"
+            displayName: "Run test commands"
